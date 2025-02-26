@@ -23,21 +23,47 @@ class CoordenadasScreen extends StatefulWidget {
 }
 
 class _CoordenadasScreenState extends State<CoordenadasScreen> {
-  final List<Map<String, double>> coordenadas = [];
+  final List<Map<String, dynamic>> coordenadas = [
+    {
+      'nome': "CCB Tancredo Neves",
+      'latitude': -8.760491,
+      'longitude': -63.835211,
+      'atualizacao': "26/02/2025",
+    },
+    {
+      'nome': "CCB Cascalheira(Flamboyant)",
+      'latitude': -8.778104,
+      'longitude': -63.837291,
+      'atualizacao': "26/02/2025",
+    },
+  ];
+  final TextEditingController nomeController = TextEditingController();
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
 
   void adicionarCoordenada() {
+    final String nome = nomeController.text.trim();
     final double? lat = double.tryParse(latitudeController.text);
     final double? lon = double.tryParse(longitudeController.text);
 
-    if (lat != null && lon != null) {
+    if (nome.isNotEmpty && lat != null && lon != null) {
       setState(() {
-        coordenadas.add({'latitude': lat, 'longitude': lon});
+        coordenadas.add({
+          'nome': nome,
+          'latitude': lat,
+          'longitude': lon,
+          'atualizacao':
+              "${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year}",
+        });
       });
 
+      nomeController.clear();
       latitudeController.clear();
       longitudeController.clear();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Por favor, insira valores válidos.')),
+      );
     }
   }
 
@@ -74,6 +100,10 @@ class _CoordenadasScreenState extends State<CoordenadasScreen> {
         child: Column(
           children: [
             TextField(
+              controller: nomeController,
+              decoration: InputDecoration(labelText: "Nome do Local"),
+            ),
+            TextField(
               controller: latitudeController,
               decoration: InputDecoration(labelText: "Latitude"),
               keyboardType: TextInputType.number,
@@ -93,14 +123,18 @@ class _CoordenadasScreenState extends State<CoordenadasScreen> {
                 itemCount: coordenadas.length,
                 itemBuilder: (context, index) {
                   final coord = coordenadas[index];
-                  return ListTile(
-                    title: Text(
-                      "Lat: ${coord['latitude']}, Lon: ${coord['longitude']}",
+                  return Card(
+                    child: ListTile(
+                      title: Text(coord['nome']),
+                      subtitle: Text(
+                        "Lat: ${coord['latitude']}, Lon: ${coord['longitude']}\n"
+                        "Última atualização: ${coord['atualizacao']}",
+                      ),
+                      trailing: Icon(Icons.map),
+                      onTap:
+                          () =>
+                              abrirMapa(coord['latitude'], coord['longitude']),
                     ),
-                    trailing: Icon(Icons.map),
-                    onTap:
-                        () =>
-                            abrirMapa(coord['latitude']!, coord['longitude']!),
                   );
                 },
               ),
