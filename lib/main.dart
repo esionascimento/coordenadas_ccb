@@ -50,7 +50,7 @@ class _CoordenadasScreenState extends State<CoordenadasScreen> {
       "https://www.google.com/maps/search/?api=1&query=$lat,$lon",
     );
 
-    if (await canLaunch(mapsMeUri.toString())) {
+    if (await canLaunchUrl(mapsMeUri)) {
       await launchUrl(mapsMeUri, mode: LaunchMode.externalApplication);
     }
     if (await launchUrl(googleMapsUri, mode: LaunchMode.externalApplication)) {
